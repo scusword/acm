@@ -3,6 +3,7 @@
 #include <string>
 #include <queue>
 #include <stack>
+#include <stdio.h>
 
 const int dx[] = {-1, 1, 0, 0};
 const int dy[] = {0, 0, -1, 1};
@@ -71,7 +72,11 @@ bool BFS(const std::string& init_state) {
 }
 
 int main() {
-    std::string s("23415x768");
-    std::cout<<BFS(s)<<std::endl;
+    std::string s(10, '\x0');w
+    char buf[10];
+    int i = 0;
+    for (;;) {
+        scanf("%c")
+    }
     return 0;
 }

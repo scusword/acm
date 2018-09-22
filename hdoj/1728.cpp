@@ -48,7 +48,11 @@ int main() {
                 std::cin>>map[i][j];
             }
         }
-        std::cin>>max_turn_cnt>>start_x>>start_y>>finish_x>>finish_y;
+        std::cin>>max_turn_cnt>>start_y>>start_x>>finish_y>>finish_x;
+        start_x--;
+        start_y--;
+        finish_x--;
+        finish_y--;
         yes = false;
         dfs_search(start_x, start_y, -1, -1);
         yes ? std::cout<<"yes\n" : std::cout<<"no\n";

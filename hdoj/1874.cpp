@@ -4,12 +4,16 @@
 int villages[200][200];
 bool flag[200];
 
+int min_distances[200];
+
 int N, M;
 int S, T;
 
 int current_distance;
 int current_min_distance;
 bool no_path;
+
+/*time out*/
 void dfs_search(int x) {
     if (x == T) {
         if (current_distance < current_min_distance) {
@@ -31,6 +35,7 @@ void dfs_search(int x) {
     }
     flag[x] = false;
 }
+
 
 int main() {
     while (std::cin>>N>>M) {

@@ -8,26 +8,25 @@ int M, N;
 
 struct state {
     char x, y;
-    char f;
     int t;
-    state(char _x, char _y, char _f, int _t) : x(_x), y(_y), f(_f), t(_t) {}
+    state(char _x, char _y, int _t) : x(_x), y(_y), t(_t) {}
     bool operator<(const state& s) const {
         return t > s.t;
     }
 };
 
-int dx[] = {0, 0, -1, 1};
-int dy[] = {-1, 1, 0, 0};
+int dx[] = {-1, 1, 0, 0};
+int dy[] = {0, 0, -1, 1};
 char ds[] = {'|', '|', '-', '-'};
 
 int bfs(char start_x, char start_y, char end_x, char end_y) {
     static bool state_map[25][25][2];
     memset(state_map, 0, sizeof(state_map));
     std::priority_queue<state> q;
-    q.push(state(start_x, start_y, 0, 0));
+    q.push(state(start_x, start_y, 0));
     char next_x, next_y;
     char next_f = 0;
-    int time;
+    int time = 0;
     while (!q.empty()) {
         const state& s = q.top();
         if (s.x == end_x && s.y == end_y) {
@@ -43,7 +42,7 @@ int bfs(char start_x, char start_y, char end_x, char end_y) {
                 continue;
             }
             if (MAP[next_x][next_y] != '.') {
-                if (s.f == 0) {
+                if (s.t % 2 == 0) {
                     if (MAP[next_x][next_y] != ds[i]) {
                         continue;
                     }
@@ -60,12 +59,12 @@ int bfs(char start_x, char start_y, char end_x, char end_y) {
                         continue;
                 }   
             }
-            next_f = s.f ? 0 : 1;
+            next_f = (s.t + 1) % 2;
             if (state_map[next_x][next_y][next_f]) {
                 continue;
             }
             state_map[next_x][next_y][next_f] = true;
-            q.push(state(next_x, next_y, next_f, s.t + 1));
+            q.push(state(next_x, next_y, s.t + 1));
         }
         q.pop();
     }

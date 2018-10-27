@@ -11,6 +11,9 @@ struct state {
     char f;
     int t;
     state(char _x, char _y, char _f, int _t) : x(_x), y(_y), f(_f), t(_t) {}
+    bool operator<(const state& s) const {
+        return t > s.t;
+    }
 };
 
 int dx[] = {0, 0, -1, 1};
@@ -20,13 +23,13 @@ char ds[] = {'|', '|', '-', '-'};
 int bfs(char start_x, char start_y, char end_x, char end_y) {
     static bool state_map[25][25][2];
     memset(state_map, 0, sizeof(state_map));
-    std::queue<state> q;
+    std::priority_queue<state> q;
     q.push(state(start_x, start_y, 0, 0));
     char next_x, next_y;
     char next_f = 0;
     int time;
     while (!q.empty()) {
-        const state& s = q.front();
+        const state& s = q.top();
         if (s.x == end_x && s.y == end_y) {
             time = s.t;
             break;
@@ -51,6 +54,11 @@ int bfs(char start_x, char start_y, char end_x, char end_y) {
                 }
                 next_x += dx[i];
                 next_y += dy[i];
+                if (next_x < 0 || next_x >= M ||
+                    next_y < 0 || next_y >= N ||
+                    MAP[next_x][next_y] == '*') {
+                        continue;
+                }   
             }
             next_f = s.f ? 0 : 1;
             if (state_map[next_x][next_y][next_f]) {

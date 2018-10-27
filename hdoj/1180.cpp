@@ -17,58 +17,79 @@ struct state {
 
 int dx[] = {-1, 1, 0, 0};
 int dy[] = {0, 0, -1, 1};
-char ds[] = {'|', '|', '-', '-'};
+
+inline 
+bool can_standby(int x, int y) {
+    return !(x < 0 || x >= M || y < 0 || y >= N || MAP[x][y] == '*');
+}
+
+inline 
+bool is_stairs(int x, int y) {
+    return MAP[x][y] == '|' || MAP[x][y] == '-';
+}
+
+inline 
+bool can_cross_stairs(int x, int y, int s_x, int s_y, bool changed) {
+    if (!changed) {
+        if ((x == s_x && MAP[s_x][s_y] == '-') ||
+            (y == s_y && MAP[s_x][s_y] == '|')) {
+            return true;
+        }
+    } else {
+        if ((x == s_x && MAP[s_x][s_y] == '|') ||
+            (y == s_y && MAP[s_x][s_y] == '-')) {
+            return true;
+        }
+    }
+    return false;
+}
 
 int bfs(char start_x, char start_y, char end_x, char end_y) {
     static bool state_map[25][25][2];
     memset(state_map, 0, sizeof(state_map));
     std::priority_queue<state> q;
+    state_map[start_x][start_y][0] = true;
     q.push(state(start_x, start_y, 0));
     char next_x, next_y;
-    char next_f = 0;
-    int time = 0;
+    int next_time;
+    auto is_visited = [](int x, int y, int t)->bool {
+        return state_map[x][y][t & 1];
+    };
+
     while (!q.empty()) {
-        const state& s = q.top();
+        state s = q.top();
         if (s.x == end_x && s.y == end_y) {
-            time = s.t;
-            break;
+            return s.t;
         }
         for (int i = 0; i < 4; i++) {
             next_x = s.x + dx[i];
             next_y = s.y + dy[i];
-            if (next_x < 0 || next_x >= M ||
-                next_y < 0 || next_y >= N ||
-                MAP[next_x][next_y] == '*') {
+            if (!can_standby(next_x, next_y)) {
                 continue;
             }
-            if (MAP[next_x][next_y] != '.') {
-                if (s.t % 2 == 0) {
-                    if (MAP[next_x][next_y] != ds[i]) {
-                        continue;
-                    }
-                } else {
-                    if (MAP[next_x][next_y] == ds[i]) {
-                        continue;
+            if (is_stairs(next_x, next_y)) {
+                if (can_standby(next_x + dx[i], next_y + dy[i])) {
+                    if (!can_cross_stairs(s.x, s.y, next_x, next_y, s.t & 1)) {
+                        next_time = s.t + 1;
+                        if (!is_visited(s.x, s.y, next_time)) {
+                            state_map[s.x][s.y][(s.t + 1) & 1] = true;
+                            q.push(state(s.x, s.y, s.t + 1));
+                        }
+                    } else {
+                        next_x += dx[i];
+                        next_y += dy[i];
                     }
                 }
-                next_x += dx[i];
-                next_y += dy[i];
-                if (next_x < 0 || next_x >= M ||
-                    next_y < 0 || next_y >= N ||
-                    MAP[next_x][next_y] == '*') {
-                        continue;
-                }   
             }
-            next_f = (s.t + 1) % 2;
-            if (state_map[next_x][next_y][next_f]) {
-                continue;
+            next_time = s.t + 1;
+            if (!is_visited(next_x, next_y, next_time)) {
+                state_map[next_x][next_y][next_time & 1] = true;
+                q.push(state(next_x, next_y, next_time));
             }
-            state_map[next_x][next_y][next_f] = true;
-            q.push(state(next_x, next_y, s.t + 1));
         }
         q.pop();
     }
-    return time;
+    return -1;
 }
 
 int main() {
